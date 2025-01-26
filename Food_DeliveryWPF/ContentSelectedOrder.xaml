@@ -1,0 +1,54 @@
+﻿<Window x:Class="Food_DeliveryWPF.ContentSelectedOrder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Food_DeliveryWPF"
+        mc:Ignorable="d"
+        Title="Содержание заказа" Height="663.8" Width="1084" Background="#FF1B1B1B">
+    <Grid>
+        <Image HorizontalAlignment="Left" Height="50" Margin="10,10,0,0" VerticalAlignment="Top" Width="50" MouseLeftButtonDown="Image_MouseLeftButtonDown" Source="/back.png" Stretch="Fill"/>
+        <Label Content="Содержание заказа" 
+HorizontalAlignment="Left" 
+Margin="150,145,0,0" 
+VerticalAlignment="Top" 
+FontSize="30" 
+FontWeight="Bold" 
+Foreground="White" FontFamily="Arial Black">
+        </Label>
+        <DataGrid x:Name="СonOrdTable" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="150,250,150,123">
+            <DataGrid.Resources>
+                <!-- Стиль для заголовков столбцов -->
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Background" Value="#FF000000"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="White"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    <Setter Property="Padding" Value="10"/>
+                </Style>
+
+                <!-- Стиль для строк данных -->
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="#FFD3D3D3"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Style>
+
+                <!-- Стиль для ячеек данных -->
+                <Style TargetType="DataGridCell">
+                    <Setter Property="BorderBrush" Value="White"/>
+                    <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                    <Setter Property="Padding" Value="10"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="14"/>
+                </Style>
+
+                <!-- Стиль для выделенной строки -->
+                <Style TargetType="DataGridRow" x:Key="SelectedRowStyle">
+                    <Setter Property="Background" Value="#FFFF8C00"/>
+                    <Setter Property="Foreground" Value="Black"/>
+                </Style>
+            </DataGrid.Resources>
+        </DataGrid>
+    </Grid>
+</Window>

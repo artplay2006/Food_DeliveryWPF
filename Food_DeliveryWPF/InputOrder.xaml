@@ -1,0 +1,65 @@
+﻿<Window x:Class="Food_DeliveryWPF.InputOrder"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Food_DeliveryWPF"
+        xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Оформление заказа" Height="400" Width="452" Background="#FF1B1B1B">
+    <Grid>
+        <Label x:Name="FullPrice" Content="Адрес доставки" 
+            HorizontalAlignment="Left" 
+            Margin="60,60,0,0" 
+            VerticalAlignment="Top" 
+            FontSize="16"
+            Foreground="White" FontFamily="Arial Black"/>
+        <TextBox x:Name="AddressOrder" HorizontalAlignment="Left" Margin="60,93,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="317" Height="17" FontSize="14" FontFamily="Arial Black"/>
+        <Label x:Name="FullPrice_Копировать" Content="Время доставки" 
+            HorizontalAlignment="Left" 
+            Margin="60,164,0,0" 
+            VerticalAlignment="Top" 
+            FontSize="16"
+            Foreground="White" FontFamily="Arial Black"/>
+        <DatePicker x:Name="DateOrder" HorizontalAlignment="Left" Margin="60,197,0,0" VerticalAlignment="Top" Width="153"/>
+        <xctk:TimePicker x:Name="TimeOrder" Margin="60,230,222,105"/>
+        <Button x:Name="CreateOrder" Content="Оформить заказ" 
+HorizontalAlignment="Left" 
+Margin="264,304,0,0" 
+VerticalAlignment="Top" 
+Width="96" 
+Height="29" 
+FontFamily="Arial Black" 
+FontSize="8" Foreground="White" Background="#FF299E00" BorderBrush="{x:Null}" Click="CreateOrder2_Click">
+            <Button.Style>
+                <Style TargetType="{x:Type Button}">
+                    <Setter Property="Background" Value="#FF4080FF"/>
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="BorderBrush" Value="#FF4080FF"/>
+                    <Setter Property="BorderThickness" Value="1"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="FontSize" Value="20"/>
+                    <Setter Property="Padding" Value="10"/>
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type Button}">
+                                <Grid>
+                                    <Border x:Name="border" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Background="{TemplateBinding Background}" CornerRadius="5"/>
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Grid>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsMouseOver" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="#FF3050FF"/>
+                                    </Trigger>
+                                    <Trigger Property="IsPressed" Value="True">
+                                        <Setter TargetName="border" Property="Background" Value="#FF203080"/>
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </Button.Style>
+        </Button>
+    </Grid>
+</Window>
