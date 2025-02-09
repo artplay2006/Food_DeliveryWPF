@@ -24,27 +24,35 @@ namespace Food_DeliveryWPF
         public AdminUsers()
         {
             InitializeComponent();
-            using (var db = new DatabaseContext())
+            LoadTable();
+        }
+        private async void LoadTable()
+        {
+            await using (var db = new DatabaseContext())
             {
-                UsersTable.ItemsSource = db.Users.ToList();
-                GetRole.ItemsSource = new string []{ "Пользователь", "Админ"};
+                await UsersTable.Dispatcher.InvokeAsync(() =>
+                {
+                    UsersTable.ItemsSource = db.Users.ToList();
+                    GetRole.ItemsSource = new string[] { "Пользователь", "Админ" };
+                });
             }
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedUser == null) { MessageBox.Show("Пользователь не выбран"); return; }
-            using(var db = new DatabaseContext())
+            await using(var db = new DatabaseContext())
             {
                 //MessageBox.Show(GetRole.SelectedIndex.ToString());
                 selectedUser.Role = GetRole.SelectedIndex;
                 db.Users.Update(selectedUser);
-                db.SaveChanges();
+                await db.SaveChangesAsync();
             }
             selectedUser = null!;
 
-            new AdminUsers().Show();
-            Close();
+            //new AdminUsers().Show();
+            //Close();
+            LoadTable();
         }
 
         //private void AddButton_Click(object sender, RoutedEventArgs e)
@@ -53,22 +61,23 @@ namespace Food_DeliveryWPF
 
         //}
 
-        private void DelFood_Click(object sender, RoutedEventArgs e)
+        private async void DelFood_Click(object sender, RoutedEventArgs e)
         {
             if (selectedUser == null) { MessageBox.Show("Пользователь не выбран"); return; }
             MessageBoxResult result = MessageBox.Show($"Вы действительно хотите удалить пользователя {selectedUser.Login}?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.Yes)
             {
-                using (var db = new DatabaseContext())
+                await using (var db = new DatabaseContext())
                 {
                     db.Users.Remove(selectedUser);
-                    db.SaveChanges();
+                    await db.SaveChangesAsync();
                 }
                 selectedUser = null!;
 
-                new AdminUsers().Show();
-                Close();
+                //new AdminUsers().Show();
+                //Close();
             }
+            LoadTable();
         }
 
         private void AdminUsers_Click(object sender, RoutedEventArgs e)

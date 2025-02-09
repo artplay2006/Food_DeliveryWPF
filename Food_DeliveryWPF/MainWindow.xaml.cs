@@ -1,4 +1,5 @@
 ﻿using Food_DeliveryWPF.Models;
+using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Windows;
 using System.Windows.Controls;
@@ -32,7 +33,7 @@ namespace Food_DeliveryWPF
             Application.Current.Shutdown();
         }
 
-        private void Login_Click(object sender, RoutedEventArgs e)
+        private async void Login_Click(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrEmpty(login.Text)) { MessageBox.Show("Логин не написан"); }
             else if (string.IsNullOrEmpty(password.Text)) { MessageBox.Show("Пароль не написан"); }
@@ -40,21 +41,23 @@ namespace Food_DeliveryWPF
             {
                 using (var db = new DatabaseContext())
                 {
-                    var user = db.Users.FirstOrDefault(u => u.Login == login.Text);
+                    var user = await db.Users.FirstOrDefaultAsync(u => u.Login == login.Text);
                     if (user == null)
                     {
-                        MessageBox.Show("Такого логина нет");
+                        //MessageBox.Show("Такого логина нет");
+                        LoginLabel.Content = "Такого логина нет";
                     }
                     else
                     {
                         if (user.Password != password.Text)
                         {
-                            MessageBox.Show("Неправильный пароль");
+                            //MessageBox.Show("Неправильный пароль");
+                            LoginLabel.Content = "Неправильный пароль";
                         }
                         else
                         {
                             CurrentUser.Login = user.Login;
-                            CurrentUser.Admin = (user.Role==1);
+                            CurrentUser.Admin = (user.Role == 1);
                             new MainMenu().Show();
                             this.Close();
                         }

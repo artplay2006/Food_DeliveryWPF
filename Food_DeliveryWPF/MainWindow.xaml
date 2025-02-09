@@ -69,7 +69,7 @@
          Background="#ECF0F1"
          Foreground="#2C3E50"
          Padding="5" VerticalAlignment="Top"/>
-        <Label Content="Логин" HorizontalAlignment="Left" Margin="501,129,0,0" VerticalAlignment="Top" FontFamily="Arial Black" FontSize="16" Foreground="White"/>
+        <Label x:Name="LoginLabel" Content="Логин" HorizontalAlignment="Left" Margin="501,129,0,0" VerticalAlignment="Top" FontFamily="Arial Black" FontSize="16" Foreground="White"/>
         <TextBox x:Name="password"
             HorizontalAlignment="Left"
             Margin="501,252,0,0"

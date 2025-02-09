@@ -1,4 +1,5 @@
 ﻿using Food_DeliveryWPF.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,27 +46,41 @@ namespace Food_DeliveryWPF
 
             // Находим WrapPanel по его имени из XAML
             wrapPanel = this.FindName("ShowSellers") as WrapPanel;
-            FillPanel("Все");
+            Task.Run(()=>FillPanel("Все"));
         }
-        
-        public void FillPanel(string category)
+
+        public async Task FillPanel(string category)
         {
             if (wrapPanel != null)
             {
-                wrapPanel.Children.Clear();
-                using (var db = new DatabaseContext())
+                // Очищаем панель в UI-потоке
+                await wrapPanel.Dispatcher.InvokeAsync(() => wrapPanel.Children.Clear());
+
+                await using (var db = new DatabaseContext())
                 {
-                    var sellers = category == "Все" ? db.Sellers: db.Sellers.Where(s=>s.Category==category);
-                    //MessageBox.Show(sellers.Count().ToString());
-                    for (int i = 0; i < sellers.Count(); i++)
+                    var sellers = category == "Все" ? db.Sellers : db.Sellers.Where(s => s.Category == category);
+
+                    // Асинхронно получаем данные из базы данных
+                    // После преобразования в список, данные уже находятся в памяти,
+                    // что позволяет избежать множественных обращений к базе данных для каждого элемента.
+                    var sellerList = await sellers.ToListAsync();
+
+                    // Добавляем элементы в панель в UI-потоке
+                    foreach (var seller in sellerList)
                     {
-                        string? name = sellers.ElementAt(i).Name;
-                        string? image = sellers.ElementAt(i).ImagePath;
-                        wrapPanel.Children.Add(AddSeller(name, image));
+                        string? name = seller.Name;
+                        string? image = seller.ImagePath;
+
+                        // Создаём элемент в UI-потоке
+                        await wrapPanel.Dispatcher.InvokeAsync(() =>
+                        {
+                            wrapPanel.Children.Add(AddSeller(name, image));
+                        });
                     }
                 }
             }
         }
+        // попробывать сделать это async
         public Border AddSeller(string ?name, string ?img)
         {
             // Создаем Grid для блока товара
@@ -155,31 +170,31 @@ namespace Food_DeliveryWPF
         private void FastFood_Click(object sender, RoutedEventArgs e)
         {
             string ?category = CategoryFastFood.Content.ToString();
-            FillPanel(category);
+            Task.Run(() => FillPanel(category));
         }
 
         private void CategoryPizza_Click(object sender, RoutedEventArgs e)
         {
             string ?category = CategoryPizza.Content.ToString();
-            FillPanel(category);
+            Task.Run(() => FillPanel(category));
         }
 
         private void CategorySushi_Click(object sender, RoutedEventArgs e)
         {
             string ?category = CategorySushi.Content.ToString();
-            FillPanel(category);
+            Task.Run(() => FillPanel(category));
         }
 
         private void CategoryShaurma_Click(object sender, RoutedEventArgs e)
         {
             string ?category = CategoryShaurma.Content.ToString();
-            FillPanel(category);
+            Task.Run(() => FillPanel(category));
         }
 
         private void AllCategoryes_Click(object sender, RoutedEventArgs e)
         {
             string? category = AllCategoryes.Content.ToString();
-            FillPanel(category);
+            Task.Run(() => FillPanel(category));
         }
 
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

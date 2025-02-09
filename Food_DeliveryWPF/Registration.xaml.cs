@@ -62,7 +62,7 @@ namespace Food_DeliveryWPF
             this.Close();
         }
 
-        private void CreateAccount(object sender, RoutedEventArgs e)
+        private async void CreateAccount(object sender, RoutedEventArgs e)
         {
             if (!ValidationLogin(login.Text))
             {
@@ -80,16 +80,17 @@ namespace Food_DeliveryWPF
             {
                 try
                 {
-                    using (var db = new DatabaseContext())
+                    await using (var db = new DatabaseContext())
                     {// 0 - обычный пользователь, 1 - админ
                         User user = new User { Login = login.Text, Password = password.Text, Role = 0 };
                         CurrentUser.Login = user.Login;
                         CurrentUser.Admin = (user.Role==1);
-                        db.Users.Add(user);
-                        db.SaveChanges();
+                        await db.Users.AddAsync(user);
+                        await db.SaveChangesAsync();
                         new MainMenu().Show();
-                        this.Close();
+                        await db.DisposeAsync();
                     }
+                    Close();
                 }
                 catch (DbUpdateException ex)
                 {

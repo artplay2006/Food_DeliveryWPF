@@ -1,4 +1,5 @@
 ﻿using Food_DeliveryWPF.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -26,51 +27,36 @@ namespace Food_DeliveryWPF
         {
             InitializeComponent();
             OrdersTable.IsReadOnly = true;
-            using (var db = new DatabaseContext()) 
-            {
-                if (CurrentUser.Admin)
+            Task.Run(async() => {
+                await using (var db = new DatabaseContext())
                 {
-                    //OrdersTable.IsReadOnly = false;
-                    OrdersTable.ItemsSource = db.Orders
-                        //.Select(o => new
-                        //{
-                        //    // Выбираем только нужные столбцы
-                        //    o.Paid,
-                        //    o.ToDelivery,
-                        //    o.OrderTime,
-                        //    o.OrderComing,
-                        //    o.LoginBuyer
-                        //    // Добавьте другие необходимые поля
-                        //})
-                        .ToList();
-                    //Save.Visibility = Visibility.Visible;
+                    if (CurrentUser.Admin)
+                    {
+                        var orders = await db.Orders.ToListAsync();
+                        await OrdersTable.Dispatcher.InvokeAsync(() =>
+                            OrdersTable.ItemsSource = orders
+                        );
+                    }
+                    else
+                    {
+                        var orders = await
+                            db.Orders
+                              .Where(o => o.LoginBuyer == CurrentUser.Login)
+                              .Select(o => new
+                              {
+                                  o.Paid,
+                                  o.ToDelivery,
+                                  o.OrderTime,
+                                  o.OrderComing
+                              })
+                              .ToListAsync();
+                        await OrdersTable.Dispatcher.InvokeAsync(() =>
+                            OrdersTable.ItemsSource = orders
+                        );
+                    }
                 }
-                else
-                {
-                    //OrdersTable.IsReadOnly = true;
-                    OrdersTable.ItemsSource = db.Orders
-                        .Where(o => o.LoginBuyer == CurrentUser.Login)
-                        .Select(o => new
-                        {
-                            // Выбираем только нужные столбцы
-                            o.Paid,
-                            o.ToDelivery,
-                            o.OrderTime,
-                            o.OrderComing,
-                            // Добавьте другие необходимые поля
-                        })
-                        .ToList();
-                    //Save.Visibility = Visibility.Collapsed;
-                }
-                // Переименование имен столбцов DataGrid
-                //((DataGridTextColumn)OrdersTable.Columns[0]).Header = "К оплате";
-                //((DataGridTextColumn)OrdersTable.Columns[1]).Header = "Адрес доставки";
-                //((DataGridTextColumn)OrdersTable.Columns[2]).Header = "Время заказа";
-                //((DataGridTextColumn)OrdersTable.Columns[3]).Header = "Время доставки";
-                //sMessageBox.Show(OrdersTable.Columns.Count.ToString());
-            }
+            });
         }
-
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Вы хотите выйти из аккаунта?", "Подтверждение", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -125,17 +111,17 @@ namespace Food_DeliveryWPF
             }
         }
         Order selectedOrder;
-        private void OrdersTable_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private async void OrdersTable_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             DataGridRow row = ItemsControl.ContainerFromElement((DataGrid)sender, e.OriginalSource as DependencyObject) as DataGridRow;
 
             if (row != null)
             {
-                    selectedOrder = row.DataContext as Order;
+                selectedOrder = row.DataContext as Order;
                 if (selectedOrder?.Id == null)
                 {
                     int index = OrdersTable.Items.IndexOf(row.DataContext);
-                    using (var db = new DatabaseContext())
+                    await using (var db = new DatabaseContext())
                     {
                         new ContentSelectedOrder(db.Orders.ElementAt(index).Id).Show();
                     }

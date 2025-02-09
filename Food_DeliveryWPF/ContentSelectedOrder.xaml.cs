@@ -28,18 +28,24 @@ namespace Food_DeliveryWPF
         public ContentSelectedOrder(int idorder)
         {
             InitializeComponent();
-            using (var db = new DatabaseContext()) 
+            Task.Run(async () =>
             {
+            await using (var db = new DatabaseContext())
+            {
+                await СonOrdTable.Dispatcher.InvokeAsync(()=>
+
                 СonOrdTable.ItemsSource = db.ContentOrders
                     .Where(co => co.IdOrder == idorder)
-                    .Select(co=>new 
-                    { 
-                        db.Foods.FirstOrDefault(f=>f.Id == co.IdFood).Name,
+                    .Select(co => new
+                    {
+                        db.Foods.FirstOrDefault(f => f.Id == co.IdFood).Name,
                         co.CountFood,
                         co.PriceDish,
-                    })                  
-                    .ToList();
-            }
+                    })
+                    .ToList()
+                    );
+                }
+            });
         }
         private void Image_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
